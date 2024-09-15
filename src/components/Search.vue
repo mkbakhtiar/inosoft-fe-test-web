@@ -1,21 +1,21 @@
 <template>
-  <div class="max-w-7xl flex items-center justify-center w-full" style="margin:-50px auto;">
+  <div class="max-w-7xl flex items-center justify-center w-full" style="margin:-80px auto;">
     <div class="w-full shadow-xl mb-20">
       <!-- Main search bar -->
       <div class="relative w-full bg-blue-primary mb-4 w-80">
         <div class="bg-white absolute w-80 rounded-tl-md" style="bottom: 80%;
           border-bottom: 50px solid #FFFFFF;
-          border-right: 50px solid #202d46;"></div>
-        <h1 class="text-3xl w-auto px-4 absolute bottom-1">I'm looking for...</h1>
+          border-right: 50px solid #1B273F;"></div>
+        <h1 class="text-3xl text-gray-700 w-auto px-6 absolute bottom-1">I'm looking for...</h1>
       </div>
 
-      <div class="flex justify-between bg-white p-4 -mt-4">
+      <div class="flex justify-between bg-white rounded-r-lg px-6 py-6 -mt-4">
         <!-- Filter dropdowns -->
         <div class="w-full mr-4 grid grid-cols-4 gap-4 rounded-r-lg bg-white">
           <div v-for="filter in filters" :key="filter.name" class="relative">
             <div 
               @click="toggleFilterList(filter)"
-              class="w-full p-3 pr-5 bg-gray-100 text-gray-700 border border-gray-300 rounded-lg cursor-pointer flex flex-col items-start justify-between relative"
+              class="w-full p-4 pr-5 bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300 rounded-lg cursor-pointer flex flex-col items-start justify-between relative"
             >
               <!-- Display filter name on top -->
               <span class="text-xs text-gray-500 mb-2">{{ filter.name }}</span>
@@ -70,7 +70,7 @@
             </div>
           </div>
         </div>
-        <button class="bg-orange-500 text-white font-bold py-2 px-4 rounded-lg flex flex-col block justify-center items-center">
+        <button class="bg-orange-500 hover:bg-orange-600 w-24 text-white font-bold py-2 px-4 rounded-lg flex flex-col block justify-center items-center">
           <font-awesome-icon icon="search" size="xl" />
           Find
         </button>

@@ -1,5 +1,5 @@
 <template>
-    <div class="vue-datatable">
+    <div class="vue-datatable max-w-7xl flex flex-col items-center justify-center w-full">
       <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-50">
