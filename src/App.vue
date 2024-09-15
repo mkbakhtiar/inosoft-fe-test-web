@@ -1,28 +1,23 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div class="home-page">
+    <Header />
+    <HeroSection />
+    <SearchSection />
+    <!-- Add more sections as needed -->
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import Header from '@/components/Header.vue'
+import HeroSection from '@/components/Hero.vue'
+import SearchSection from '@/components/Search.vue'
 
 export default {
-  name: 'App',
+  name: 'HomePage',
   components: {
-    HelloWorld
+    Header,
+    HeroSection,
+    SearchSection
   }
 }
 </script>
-
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
-</style>
