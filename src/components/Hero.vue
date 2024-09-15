@@ -1,5 +1,5 @@
 <template>
-    <section class="bg-hero-background bg-contain pt-8 bg-blue-primary bg-no-repeat text-white h-auto" style="background-position: -50px 0;">
+    <section class="bg-hero-background bg-auto pt-8 bg-blue-primary bg-no-repeat text-white h-auto" style="background-position: -50px 0px;">
       <div class="container mx-auto px-4 flex items-center">
         <div class="flex justify-start">
           <img src="@/assets/worker.webp" alt="Oil worker" class="w-full">

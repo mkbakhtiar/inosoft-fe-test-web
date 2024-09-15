@@ -6,9 +6,10 @@ import {
   faBalanceScale,
   faShoppingCart,
   faKey,
-  faArrowDown
+  faArrowDown,
+  faSearch
 } from '@fortawesome/free-solid-svg-icons'
 
-library.add(faArrowDown, faHeart, faBalanceScale, faShoppingCart, faKey)
+library.add(faArrowDown, faSearch, faHeart, faBalanceScale, faShoppingCart, faKey)
 
 Vue.component('font-awesome-icon', FontAwesomeIcon)
