@@ -14,14 +14,32 @@
         <div v-for="filter in filters" :key="filter.name" class="relative">
           <div 
             @click="toggleFilterList(filter)"
-            class="w-full p-2 pr-8 bg-white text-gray-700 border rounded-lg cursor-pointer flex justify-between items-center"
+            class="w-full p-2 pr-8 bg-gray-200 text-gray-700 border border-gray-300 rounded-lg cursor-pointer flex flex-col items-start justify-between relative"
           >
-            <span>{{ filter.selected || filter.name }}</span>
-            <svg class="w-4 h-4 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            <!-- Display filter name on top -->
+            <span class="text-sm text-gray-500">{{ filter.name }}</span>
+
+            <!-- Display selected value below the filter name -->
+            <div class="w-full flex justify-between items-center">
+              <span>{{ filter.selected || 'Select ' + filter.name }}</span>
+
+              <!-- Clear button -->
+              <button 
+                v-if="filter.selected" 
+                @click.stop="clearFilter(filter)" 
+                class="ml-2 w-6 h-6 bg-gray-200 text-gray-700 rounded-full flex items-center justify-center">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+              </button>
+              
+              <!-- Dropdown arrow -->
+              <svg class="w-4 h-4 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            </div>
           </div>
           
           <!-- Custom dropdown for each filter -->
-          <div v-if="filter.showList" class="bg-white border rounded-lg shadow-sm py-4 absolute z-10 mt-2 w-full">
+          <div v-if="filter.showList" class="bg-white border border-gray-300 rounded-lg shadow-sm py-4 absolute z-10 mt-2 w-full">
             <div class="px-4">
               <h3 class="text-gray-700 mb-2">Select a {{ filter.name }}</h3>
               <div class="relative">
@@ -39,11 +57,11 @@
             <ul class="space-y-2 max-h-60 overflow-y-auto">
               <li 
                 v-for="option in getFilteredOptions(filter)" 
-                :key="option.name" 
+                :key="option" 
                 @click="selectFilterOption(filter, option)"
                 class="flex justify-between items-center cursor-pointer hover:bg-gray-100 p-1 px-4 rounded"
               >
-                <span class="text-gray-700">{{ option.name }}</span>
+                <span class="text-gray-700">{{ option }}</span>
                 <span v-if="option.count" class="text-orange-500">{{ option.count }}</span>
               </li>
             </ul>
@@ -59,6 +77,9 @@
 </template>
 
 <script>
+import axios from 'axios';
+import { API_ENDPOINTS } from '@/api/endpoints'; // Adjust the path according to your project structure
+
 export default {
   data() {
     return {
@@ -69,44 +90,39 @@ export default {
         { name: 'Grade', selected: '', showList: false, search: '' },
         { name: 'Connection', selected: '', showList: false, search: '' },
       ],
-      productTypes: [
-        { name: 'Blast Joint', count: 96 },
-        { name: 'Casing', count: 253 },
-        { name: 'Conductor', count: 220 },
-        { name: 'Coupling', count: 106 },
-        { name: 'Coupling Stock', count: 142 },
-        { name: 'Pup Joint', count: 113 },
-      ],
-      sizes: [
-        { name: '2 3/8"', count: 150 },
-        { name: '2 7/8"', count: 200 },
-        { name: '3 1/2"', count: 180 },
-        { name: '4 1/2"', count: 160 },
-        { name: '5 1/2"', count: 140 },
-        { name: '7"', count: 120 },
-        { name: '9 5/8"', count: 100 },
-      ],
-      grades: [
-        { name: 'J55', count: 250 },
-        { name: 'K55', count: 200 },
-        { name: 'N80', count: 180 },
-        { name: 'L80', count: 160 },
-        { name: 'C90', count: 140 },
-        { name: 'T95', count: 120 },
-        { name: 'P110', count: 100 },
-      ],
-      connections: [
-        { name: 'BTC', count: 200 },
-        { name: 'STC', count: 180 },
-        { name: 'LTC', count: 160 },
-        { name: 'Premium', count: 140 },
-        { name: 'Tenaris Blue', count: 120 },
-        { name: 'VAM TOP', count: 100 },
-        { name: 'FOX', count: 80 },
-      ],
-    }
+      productTypes: [],
+      sizes: [],
+      grades: [],
+      connections: [],
+    };
+  },
+  mounted() {
+    // Call the API to load the filter data with default filters (empty initially)
+    this.loadFilterData();
   },
   methods: {
+    async loadFilterData() {
+      // Extract selected filter values to be sent as query parameters
+      const params = {
+        productType: this.filters[0].selected || '',  // Assuming 'Product Type' is the first filter
+        size: this.filters[1].selected || '',         // Assuming 'Size' is the second filter
+        grade: this.filters[2].selected || '',        // Assuming 'Grade' is the third filter
+        connection: this.filters[3].selected || ''    // Assuming 'Connection' is the fourth filter
+      };
+
+      try {
+        const response = await axios.get(API_ENDPOINTS.FILTER_DATA_PIPES, { params });
+
+        const { product_type, size, grade, connection } = response.data.filters;
+
+        this.productTypes = product_type;
+        this.sizes = size;
+        this.grades = grade;
+        this.connections = connection;
+      } catch (error) {
+        console.error('Error loading filter data:', error);
+      }
+    },
     toggleFilterList(filter) {
       this.filters.forEach(f => {
         if (f !== filter) f.showList = false;
@@ -131,14 +147,21 @@ export default {
         default:
           options = [];
       }
+      
       return options.filter(option => 
-        option.name.toLowerCase().includes(filter.search.toLowerCase())
+        option.toLowerCase().includes(filter.search.toLowerCase())
       );
     },
-    selectFilterOption(filter, option) {
-      filter.selected = option.name;
-      filter.showList = false;
+    clearFilter(filter) {
+      filter.selected = ''; // Clear the selected value
     },
-  }
-}
+    selectFilterOption(filter, option) {
+      filter.selected = option;
+      filter.showList = false;
+      // Reload filter data when a new option is selected
+      this.loadFilterData();
+    },
+  },
+};
 </script>
+

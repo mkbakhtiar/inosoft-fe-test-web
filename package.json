@@ -12,8 +12,10 @@
     "@fortawesome/free-regular-svg-icons": "^6.6.0",
     "@fortawesome/free-solid-svg-icons": "^6.6.0",
     "@fortawesome/vue-fontawesome": "^2.0.10",
+    "axios": "^1.7.7",
     "core-js": "^3.6.5",
-    "vue": "^2.6.11"
+    "vue": "^2.6.11",
+    "vue-axios": "^3.5.2"
   },
   "devDependencies": {
     "@tailwindcss/postcss7-compat": "^2.2.17",
