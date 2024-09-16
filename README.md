@@ -14,5 +14,11 @@ npm install
 ```
 npm run serve
 ```
+
+### Create .env
+```
+VUE_APP_API_HOST = http://localhost:8000 for connect to the API Host
+```
+
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
