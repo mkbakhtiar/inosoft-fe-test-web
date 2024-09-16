@@ -136,7 +136,7 @@ export default {
       return this.selectedFilters[filterType] || '';
     },
     findProducts() {
-      console.log('Searching for products with current filters:', this.selectedFilters);
+      this.emitFilterChange();
     }
   },
 };
