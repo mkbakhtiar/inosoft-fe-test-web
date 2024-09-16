@@ -155,18 +155,28 @@ export default {
         option.name.toLowerCase().includes(filter.search.toLowerCase())
       );
     },
-    clearFilter(filter) {
-      filter.selected = ''; // Clear the selected value
-      filter.showList = false;
-      // Reload filter data when a new option is selected
-      this.loadFilterData();
-    },
     selectFilterOption(filter, option) {
       filter.selected = option.name;
       filter.showList = false;
-      // Reload filter data when a new option is selected
       this.loadFilterData();
+      this.emitFilterChange();
     },
+
+    clearFilter(filter) {
+      filter.selected = '';
+      filter.showList = false;
+      this.loadFilterData();
+      this.emitFilterChange();
+    },
+    emitFilterChange() {
+      const currentFilters = {
+        productType: this.filters[0].selected || '',
+        size: this.filters[1].selected || '',
+        grade: this.filters[2].selected || '',
+        connection: this.filters[3].selected || ''
+      };
+      this.$emit('filters-changed', currentFilters);
+    }
   },
 };
 </script>

@@ -2,8 +2,11 @@
   <div class="home-page">
     <Header />
     <HeroSection />
-    <SearchSection />
-    <div class="my-16">
+    <SearchSection @filters-changed="updateFilters" />
+    <div class="my-16 relative">
+      <div v-if="loading" class="absolute inset-0 flex items-center justify-center bg-white bg-opacity-70 z-10">
+        <Spinner />
+      </div>
       <DataTable :columns="columns" :data="allData" />
     </div>
   </div>
@@ -16,6 +19,7 @@ import Header from '@/components/Header.vue'
 import HeroSection from '@/components/Hero.vue'
 import SearchSection from '@/components/Search.vue'
 import DataTable from '@/components/DataTable.vue'
+import Spinner from '@/components/Spinner.vue'
 
 import { API_ENDPOINTS } from '@/api/endpoints';
 
@@ -25,7 +29,8 @@ export default {
     Header,
     HeroSection,
     SearchSection,
-    DataTable
+    DataTable,
+    Spinner
   },
   data() {
     return {
@@ -41,12 +46,14 @@ export default {
         { key: 'connection', label: 'Connection' },
       ],
       filters: {
-        product_type: '',
+        productType: '',
         size: '',
         grade: '',
         connection: ''
       },
-      allData: []
+      allData: [],
+      loading: false,
+      error: null
     }
   },
   mounted() {
@@ -57,10 +64,7 @@ export default {
       this.loading = true;
       this.error = null;
       try {
-        const response = await axios.get(API_ENDPOINTS.SEARCH_DATA_PIPES, {
-          params: { ...this.filters }
-        });
-        
+        const response = await axios.get(API_ENDPOINTS.SEARCH_DATA_PIPES, { params: { ...this.filters } });
         this.allData = response.data;
       } catch (error) {
         this.error = 'An error occurred while fetching data. Please try again.';
@@ -69,6 +73,16 @@ export default {
         this.loading = false;
       }
     },
+    updateFilters(newFilters) {
+      // Set filter from search component data emits
+      this.filters = {
+        productType: newFilters.productType,
+        size: newFilters.size,
+        grade: newFilters.grade,
+        connection: newFilters.connection
+      };
+      this.fetchData(); // Fetch new data with updated filters
+    }
   }
 }
 </script>
