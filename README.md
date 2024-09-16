@@ -6,6 +6,11 @@ NodeJs Version = 18.18.0
 ```
 
 ## Project setup
+1. Clone the repository (or download and extract the ZIP file):
+```
+git clone https://github.com/mkbakhtiar/inosoft-fe-test-web.git
+```
+2. Install Node Modules:
 ```
 npm install
 ```
