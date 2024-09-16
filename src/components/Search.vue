@@ -22,11 +22,11 @@
 
               <!-- Display selected value below the filter name -->
               <div class="w-full flex justify-between items-center">
-                <span class="text-orange-500 text-sm font-bold">{{ filter.selected || 'ALL'}}</span>
+                <span class="text-orange-500 text-sm font-bold">{{ getSelectedFilter(filter.type) || 'ALL' }}</span>
                 <div class="flex items-center gap-x-1">
                   <!-- Clear button -->
                   <button 
-                    v-if="filter.selected" 
+                    v-if="getSelectedFilter(filter.type)" 
                     @click.stop="clearFilter(filter)" 
                     class="ml-2 w-6 h-6 bg-gray-200 text-gray-700 rounded-full flex items-center justify-center">
                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -59,7 +59,7 @@
               <ul class="space-y-2 max-h-60 overflow-y-auto">
                 <li 
                   v-for="option in getFilteredOptions(filter)" 
-                  :key="option" 
+                  :key="option.name" 
                   @click="selectFilterOption(filter, option)"
                   class="flex justify-between items-center cursor-pointer hover:bg-gray-100 p-1 px-4 rounded"
                 >
@@ -70,7 +70,7 @@
             </div>
           </div>
         </div>
-        <button class="bg-orange-500 hover:bg-orange-600 w-24 text-white font-bold py-2 px-4 rounded-lg flex flex-col block justify-center items-center">
+        <button @click="findProducts" class="bg-orange-500 hover:bg-orange-600 w-24 text-white font-bold py-2 px-4 rounded-lg flex flex-col block justify-center items-center">
           <font-awesome-icon icon="search" size="xl" />
           Find
         </button>
@@ -80,52 +80,33 @@
 </template>
 
 <script>
-import axios from 'axios';
-import { API_ENDPOINTS } from '@/api/endpoints'; // Adjust the path according to your project structure
+import { mapActions, mapGetters, mapState } from 'vuex';
 
 export default {
   data() {
     return {
-      selectedProduct: '',
       filters: [
-        { name: 'Product Type', selected: '', showList: false, search: '' },
-        { name: 'Size', selected: '', showList: false, search: '' },
-        { name: 'Grade', selected: '', showList: false, search: '' },
-        { name: 'Connection', selected: '', showList: false, search: '' },
+        { name: 'Product Type', type: 'productType', showList: false, search: '' },
+        { name: 'Size', type: 'size', showList: false, search: '' },
+        { name: 'Grade', type: 'grade', showList: false, search: '' },
+        { name: 'Connection', type: 'connection', showList: false, search: '' },
       ],
-      productTypes: [],
-      sizes: [],
-      grades: [],
-      connections: [],
     };
   },
-  mounted() {
-    // Call the API to load the filter data with default filters (empty initially)
-    this.loadFilterData();
+  computed: {
+    ...mapState('filters', ['selectedFilters']),
+    ...mapGetters('filters', ['getFilterOptions']),
+  },
+  created() {
+    // Check Store Vuex is working or not
+    if (this.loadFilterData) {
+      this.loadFilterData();
+    } else {
+      console.log('loadFilterData is not defined');
+    }
   },
   methods: {
-    async loadFilterData() {
-      // Extract selected filter values to be sent as query parameters
-      const params = {
-        productType: this.filters[0].selected || '',  // Assuming 'Product Type' is the first filter
-        size: this.filters[1].selected || '',         // Assuming 'Size' is the second filter
-        grade: this.filters[2].selected || '',        // Assuming 'Grade' is the third filter
-        connection: this.filters[3].selected || ''    // Assuming 'Connection' is the fourth filter
-      };
-
-      try {
-        const response = await axios.get(API_ENDPOINTS.FILTER_DATA_PIPES, { params });
-
-        const { product_type, size, grade, connection } = response.data.filters;
-
-        this.productTypes = product_type;
-        this.sizes = size;
-        this.grades = grade;
-        this.connections = connection;
-      } catch (error) {
-        console.error('Error loading filter data:', error);
-      }
-    },
+    ...mapActions('filters', ['loadFilterData', 'updateSelectedFilter']),
     toggleFilterList(filter) {
       this.filters.forEach(f => {
         if (f !== filter) f.showList = false;
@@ -133,51 +114,30 @@ export default {
       filter.showList = !filter.showList;
     },
     getFilteredOptions(filter) {
-      let options;
-      switch(filter.name) {
-        case 'Product Type':
-          options = this.productTypes;
-          break;
-        case 'Size':
-          options = this.sizes;
-          break;
-        case 'Grade':
-          options = this.grades;
-          break;
-        case 'Connection':
-          options = this.connections;
-          break;
-        default:
-          options = [];
-      }
-      
+      const options = this.getFilterOptions(filter.type + 's');
       return options.filter(option => 
         option.name.toLowerCase().includes(filter.search.toLowerCase())
       );
     },
-    selectFilterOption(filter, option) {
-      filter.selected = option.name;
-      filter.showList = false;
-      this.loadFilterData();
-      this.emitFilterChange();
-    },
-
-    clearFilter(filter) {
-      filter.selected = '';
-      filter.showList = false;
-      this.loadFilterData();
-      this.emitFilterChange();
-    },
     emitFilterChange() {
-      const currentFilters = {
-        productType: this.filters[0].selected || '',
-        size: this.filters[1].selected || '',
-        grade: this.filters[2].selected || '',
-        connection: this.filters[3].selected || ''
-      };
-      this.$emit('filters-changed', currentFilters);
+      this.$emit('filters-changed', this.selectedFilters);
+    },
+    selectFilterOption(filter, option) {
+      this.updateSelectedFilter({ filterType: filter.type, value: option.name });
+      filter.showList = false;
+      this.emitFilterChange();
+    },
+    clearFilter(filter) {
+      this.updateSelectedFilter({ filterType: filter.type, value: '' });
+      filter.showList = false;
+      this.emitFilterChange();
+    },
+    getSelectedFilter(filterType) {
+      return this.selectedFilters[filterType] || '';
+    },
+    findProducts() {
+      console.log('Searching for products with current filters:', this.selectedFilters);
     }
   },
 };
 </script>
-
